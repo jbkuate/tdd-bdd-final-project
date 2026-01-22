@@ -107,6 +107,7 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+    #READ test case
     def test_read_a_product(self):
         """It should create a product, assign it an ID, save it to the system, retrieve it back using the ID,
         and verify that the retrieved product has the same properties as the original product."""
@@ -124,6 +125,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found_product.available, product.available)
         self.assertEqual(found_product.category, product.category)
 
+    #UPDATE test case 
     def test_update_a_product(self):
         """It should create a product, save it to the system, update its properties, verify the updated properties,
         fetch the product back from the system, and confirm that the fetched product has the updated properties."""
@@ -145,6 +147,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found_product.id, original_id)
         self.assertEqual(found_product.description, "update a product description work fine")
 
+    #UPDATE EMPTY ID test case
     def test_update_a_product_empty_id(self):
         """It should test raises error when the ID is empty"""
         product = ProductFactory()
@@ -152,6 +155,7 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         self.assertRaises(DataValidationError, product.update)
 
+    #DELETE test case
     def test_delete_a_product(self):
         """It should create a product, save it to the database, delete it,
         and verify that the product is no longer present in the database."""
@@ -163,6 +167,7 @@ class TestProductModel(unittest.TestCase):
         product.delete()
         self.assertEqual(len(Product.all()), 0)
 
+    #LIST ALL test case
     def test_list_all_products(self):
         """It should check that initially there are no products, create five products,
         and confirm that the count of the retrieved products matches the expected count of 5."""
@@ -176,6 +181,7 @@ class TestProductModel(unittest.TestCase):
         products = Product.all()
         self.assertEqual(len(products), 5)
 
+    #FIND BY NAME test case 
     def test_find_a_product_by_name(self):
         """this test case should verify if the Product.find_by_name() method correctly retrieves
         products from the database based on their name,by creating a batch of products,
@@ -192,6 +198,7 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.name, name)
 
+    #FIND BY AVAILABILITY test 
     def test_find_a_product_by_availability(self):
         """this test case should verify if the Product.find_by_availability() method correctly retrieves
         products from the database based on their availability,by creating a batch of products,
@@ -208,6 +215,7 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.available, available)
 
+    #FIND BY CATEGORY test 
     def test_find_a_product_by_category(self):
         """this test case should verify if the Product.find_by_category() method correctly retrieves products
         from the database based on their category, by creating a batch of products, saving them to the database,

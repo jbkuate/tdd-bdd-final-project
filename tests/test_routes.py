@@ -165,7 +165,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     #
-    # ADD YOUR TEST CASES HERE
+    # ADD MY TEST CASES HERE
     #
     #################################################################
     #   Get a product
@@ -187,7 +187,7 @@ class TestProductRoutes(TestCase):
         self.assertIn("was not found", data["message"])
 
     #################################################################
-    #   update a product
+    #   Update a product
     #################################################################
     def test_update_product(self):
         """It should Update an existing Product"""
@@ -307,7 +307,7 @@ class TestProductRoutes(TestCase):
             self.assertEqual(product["category"], category.name)
 
     ##############################################################
-    #   List product by category
+    #   List product by availability
     #################################################################
     def test_query_by_availability(self):
         """It should Query Products by availability"""
@@ -331,6 +331,7 @@ class TestProductRoutes(TestCase):
         # use a for loop to check each product in the data list and verify that the "available" attribute of each product is set to True
         for product in data:
             self.assertTrue(product["available"] is True)
+    
     ######################################################################
     # Utility functions
     ######################################################################

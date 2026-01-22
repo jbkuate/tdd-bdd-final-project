@@ -3,6 +3,8 @@ Environment for Behave Testing
 """
 from os import getenv
 from selenium import webdriver
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '30'))
 BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
@@ -35,12 +37,16 @@ def get_chrome():
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--headless")
-    return webdriver.Chrome(options=options)
+    # Automatically downloads and installs the correct geckodriver
+    service = Service(GeckoDriverManager().install())
+    return webdriver.Chrome(options=options, service=service)
 
 
 def get_firefox():
     """Creates a headless Firefox driver"""
     options = webdriver.FirefoxOptions()
     options.add_argument("--headless")
-    return webdriver.Firefox(options=options)    
+    # Automatically downloads and installs the correct geckodriver
+    service = Service(GeckoDriverManager().install())
+    return webdriver.Firefox(options=options, service=service)    
     

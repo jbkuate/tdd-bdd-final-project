@@ -20,7 +20,7 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
@@ -89,40 +89,114 @@ def create_products():
     #
     # Uncomment this line of code once you implement READ A PRODUCT
     #
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
-    location_url = "/"  # delete once READ is implemented
+    location_url = url_for("get_products", product_id=product.id, _external=True)
+    # location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
 ######################################################################
 # L I S T   A L L   P R O D U C T S
 ######################################################################
+@app.route("/products", methods=["GET"])
+def list_products():
+    """Returns a list of Products"""
+    app.logger.info("Request to list Products...")
 
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
+    # Initialize an empty list to hold the products.
+    products = []
+    # Get the `name` parameter from the request (hint: use `request.args.get()`
+    name = request.args.get('name')
+    # Get the `category` parameter from the request (hint: use `request.args.get()`
+    category = request.args.get('category')
+    # Get the `available` parameter from the request (hint: use `request.args.get()`
+    available = request.args.get('available')
+    # test to see if you received the "name" query parameter
+    if name:
+        app.logger.info("Find by name: %s", name)
+        # If you did, call the Product.find_by_name(name) method to retrieve products that match the specified name
+        products = Product.find_by_name(name)
+    # test to see if you received the "category" query parameter
+    elif category:
+        # If you did, convert the category string retrieved from the query parameters to the corresponding enum value from the Category enumeration
+        # call the Product.find_by_category(category_value) method to retrieve products that match the specified category_value
+        app.logger.info("Find by category: %s", category)
+        category_value = getattr(Category, category.upper())
+        products = Product.find_by_category(category_value)
+    # test to see if you received the "available" query parameter
+    elif available:
+        # If you did, convert the available string retrieved from the query parameters to a boolean value
+        # call the Product.find_by_availability(available_value) method to retrieve products that match the specified available_value
+        app.logger.info("Find by availibility: %s", available)
+        available_value = bool(available)
+        products = Product.find_by_availability(available_value)
+    else:
+        app.logger.info("Find all")
+        # If you didn't call list all
+        products = Product.all()
+
+    results = [product.serialize() for product in products]
+    app.logger.info("[%s] Products returned", len(results))
+    return results, status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
+@app.route("/products/<int:product_id>", methods=["GET"])
+def get_products(product_id):
+    """
+    Retrieve a single Product
+    This endpoint will return a Product based on it's id
+    """
+    app.logger.info("Request to Retrieve a product with id [%s]", product_id)
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+    app.logger.info("Returning product: %s", product.name)
+    return product.serialize(), status.HTTP_200_OK
 
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
 
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
+@app.route("/products/<int:product_id>", methods=["PUT"])
+def update_products(product_id):
+    """
+    Update an Product
+    This endpoint will update a Product based on the body that is posted
+    """
+    app.logger.info("Request to Update a product with id [%s]", product_id)
+    check_content_type("application/json")
 
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
+    # use the Product.find() method to retrieve the product by the product_id
+    product = Product.find(product_id)
+    # abort() with a status.HTTP_404_NOT_FOUND if it cannot be found
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+    # call the deserialize() method on the product passing in request.get_json()
+    product.deserialize(request.get_json())
+    # call product.update() to update the product with the new data
+    product.id = product_id
+    product.update()
+    # return the serialize() version of the product with a return code of status.HTTP_200_OK
+    return product.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_products(product_id):
+    """
+    Delete a Product
 
+    This endpoint will delete a Product based the id specified in the path
+    """
+    app.logger.info("Request to Delete a product with id [%s]", product_id)
 
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+    # use the Product.find() method to retrieve the product by the product_id
+    found = Product.find(product_id)
+    # if found, call the delete() method on the product
+    if found:
+        found.delete()
+    # return and empty body ("") with a return code of status.HTTP_204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
